@@ -40,21 +40,7 @@ let gameOver = function () {
   context.fillText("Game over", width / 2, height / 2);
 };
 
-// constructor for invisible cells
-let Block = function (col, row) {
-  this.col = col;
-  this.row = row;
-};
-
-Block.prototype.drawSquare = function (color) {                        // draw a square for snake
-  let x = this.col * blockSize;
-  let y = this.row * blockSize;
-
-  context.fillStyle = color;
-
-  context.fillRect(x, y, blockSize, blockSize);
-};
-
+// draw a circle
 let circle = function (x, y, radius, fillCircle) {
   context.beginPath();
   context.arc(x, y, radius, 0, Math.PI * 2, false);
@@ -66,7 +52,22 @@ let circle = function (x, y, radius, fillCircle) {
   }
 };
 
-Block.prototype.drawCircle = function (color) {                       // draw a circle for apple
+// constructor for invisible cells
+let Block = function (col, row) {
+  this.col = col;
+  this.row = row;
+};
+
+Block.prototype.drawSquare = function (color) {                     
+  let x = this.col * blockSize;
+  let y = this.row * blockSize;
+
+  context.fillStyle = color;
+
+  context.fillRect(x, y, blockSize, blockSize);
+};
+
+Block.prototype.drawCircle = function (color) {                      
   let centerX = this.col * blockSize + blockSize / 2;
   let centerY = this.row * blockSize + blockSize / 2;
 
@@ -80,7 +81,7 @@ Block.prototype.equal = function (otherBlock) {                       // compare
 };
 
 // create a snake
-let Snake = function () {                                             // constructor of snake
+let Snake = function () {                                            
   this.segments = [
     new Block(7, 5),
     new Block(6, 5),
@@ -91,7 +92,7 @@ let Snake = function () {                                             // constru
   this.nextDirection = "right";
 };
 
-Snake.prototype.draw = function () {                                  // draw a snake
+Snake.prototype.draw = function () {                                  
   for (let i = 0; i < this.segments.length; i++) {
     this.segments[i].drawSquare("blue");
   }
@@ -108,7 +109,7 @@ Snake.prototype.move = function () {
     newHead = new Block(head.col + 1, head.row);
   } else if (this.direction === "down") {
     newHead = new Block(head.col, head.row +1);
-  } else if (this.directiom === "left") {
+  } else if (this.direction === "left") {
     newHead = new Block(head.col - 1, head.row);
   } else if (this.direction === "up") {
     newHead = new Block(head.col, head.row - 1);
@@ -129,7 +130,7 @@ Snake.prototype.move = function () {
   }
 };
 
-Snake.prototype.checkCollision = function (head) {                    // collision check
+Snake.prototype.checkCollision = function (head) {                    
   let leftCollision = (head.col === 0),
       topCollision = (head.row === 0),
       rightCollision = (head.col === widthInBlock - 1),
@@ -148,4 +149,63 @@ Snake.prototype.checkCollision = function (head) {                    // collisi
   return wallCollision || selfCollision;
 };
 
+Snake.prototype.setDirection = function (newDirection) {
+  if (this.direction === "up" && newDirection === "down") {
+    return;
+  } else if (this.direction === "right" && newDirection === "left") {
+    return;
+  } else if (this.direction === "down" && newDirection === "up") {
+    return;
+  } else if (this.direction === "left" && newDirection === "right") {
+    return;
+  }
+
+  this.nextDirection = newDirection;
+};
+
+// create an apple
+let Apple = function () {
+  this.position = new Block(10, 10);
+};
+
+Apple.prototype.draw = function () {
+  this.position.drawCircle("limeGreen");
+};
+
+Apple.prototype.move = function () {
+  let randomCol = Math.floor(Math.random() * (widthInBlock - 2)) + 1,
+      randomRow = Math.floor(Math.random() * (heightInBlock - 2)) + 1;
+  
+  this.position = new Block(randomCol, randomRow);
+};
+
+let snake = new Snake(),
+    apple = new Apple();
+
+let intervalId = setInterval(function () {
+  context.clearRect(0, 0, width, height);
+  
+  drawScore();
+  snake.move();
+  snake.draw();
+  apple.draw();
+  drawBorder();
+
+}, 100);
+
+
 // keyboard control
+let directions = {
+  37: "left",
+  38: "up",
+  39: "right",
+  40: "down"
+};
+
+$("body").keydown(function (event) {
+  let newDirection = directions[event.keyCode];
+
+  if (newDirection !== undefined) {
+    snake.setDirection(newDirection);
+  }
+});
