@@ -67,17 +67,85 @@ let circle = function (x, y, radius, fillCircle) {
 };
 
 Block.prototype.drawCircle = function (color) {                       // draw a circle for apple
-  let centerX = this.col + blockSize + blockSize / 2;
-  let centerY = this.row + blockSize + blockSize / 2;
+  let centerX = this.col * blockSize + blockSize / 2;
+  let centerY = this.row * blockSize + blockSize / 2;
 
   context.fillStyle = color;
 
   circle(centerX, centerY, blockSize / 2, true);
 };
 
-let sampleCircle = new Block(4, 3);
-sampleCircle.drawCircle("green");
-
 Block.prototype.equal = function (otherBlock) {                       // compare the positions of two objects
   return this.col === otherBlock.col && this.row === otherBlock.row; 
 };
+
+// create a snake
+let Snake = function () {                                             // constructor of snake
+  this.segments = [
+    new Block(7, 5),
+    new Block(6, 5),
+    new Block(5, 5)
+  ];
+
+  this.direction = "right";
+  this.nextDirection = "right";
+};
+
+Snake.prototype.draw = function () {                                  // draw a snake
+  for (let i = 0; i < this.segments.length; i++) {
+    this.segments[i].drawSquare("blue");
+  }
+};
+
+// move the snake
+Snake.prototype.move = function () {
+  let head = this.segments[0],
+      newHead;
+  
+  this.direction = this.nextDirection;
+
+  if (this.direction === "right") {
+    newHead = new Block(head.col + 1, head.row);
+  } else if (this.direction === "down") {
+    newHead = new Block(head.col, head.row +1);
+  } else if (this.directiom === "left") {
+    newHead = new Block(head.col - 1, head.row);
+  } else if (this.direction === "up") {
+    newHead = new Block(head.col, head.row - 1);
+  }
+
+  if (this.checkCollision(newHead)) {
+    gameOver();
+    return;
+  }
+
+  this.segments.unshift(newHead);
+
+  if (newHead.equal(apple.position)) {
+    score++;
+    apple.move();
+  } else {
+    this.segments.pop();
+  }
+};
+
+Snake.prototype.checkCollision = function (head) {                    // collision check
+  let leftCollision = (head.col === 0),
+      topCollision = (head.row === 0),
+      rightCollision = (head.col === widthInBlock - 1),
+      bottomCollision = (head.row === heightInBlock - 1);
+  
+  let wallCollision = leftCollision || topCollision || rightCollision || bottomCollision;
+
+  let selfCollision = false;
+
+  for (let i = 0; i < this.segments.length; i++) {
+    if (head.equal(this.segments[i])) {
+      selfCollision = true;
+    }
+  }
+
+  return wallCollision || selfCollision;
+};
+
+// keyboard control
