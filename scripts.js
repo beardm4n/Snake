@@ -4,6 +4,8 @@ let canvas = document.querySelector("#canvas"),
     width = canvas.width,
     height = canvas.height;
 
+document.querySelector("canvas").style.backgroundColor = "rgba(244,244,244,0.64)";
+
 // divide the canvas into cells
 let blockSize = 10,
     widthInBlock = width / blockSize,
@@ -76,7 +78,7 @@ Block.prototype.drawCircle = function (color) {
   circle(centerX, centerY, blockSize / 2, true);
 };
 
-Block.prototype.equal = function (otherBlock) {                       // compare the positions of two objects
+Block.prototype.equal = function (otherBlock) {
   return this.col === otherBlock.col && this.row === otherBlock.row; 
 };
 
@@ -93,8 +95,14 @@ let Snake = function () {
 };
 
 Snake.prototype.draw = function () {                                  
-  for (let i = 0; i < this.segments.length; i++) {
-    this.segments[i].drawSquare("blue");
+  this.segments[0].drawSquare("#4600ff");
+
+  for (let i = 1; i < this.segments.length; i+=2) {
+    this.segments[i].drawSquare("#e36806");
+  }
+
+  for (let i = 2; i < this.segments.length; i+=2) {
+    this.segments[i].drawSquare("#e30c00");
   }
 };
 
@@ -136,7 +144,8 @@ Snake.prototype.checkCollision = function (head) {
       rightCollision = (head.col === widthInBlock - 1),
       bottomCollision = (head.row === heightInBlock - 1);
   
-  let wallCollision = leftCollision || topCollision || rightCollision || bottomCollision;
+  let wallCollision = leftCollision || topCollision ||
+      rightCollision || bottomCollision;
 
   let selfCollision = false;
 
