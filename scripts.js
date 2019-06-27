@@ -98,7 +98,7 @@ Snake.prototype.draw = function () {
   this.segments[0].drawSquare("#4600ff");
 
   for (let i = 1; i < this.segments.length; i+=2) {
-    this.segments[i].drawSquare("#e36806");
+    this.segments[i].drawSquare("#e76a06");
   }
 
   for (let i = 2; i < this.segments.length; i+=2) {
