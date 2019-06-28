@@ -132,7 +132,7 @@ Snake.prototype.move = function () {
 
   if (newHead.equal(apple.position)) {
     score++;
-    apple.move();
+    apple.move(this.segments);
     animationTime -= 1;
   } else {
     this.segments.pop();
@@ -182,11 +182,19 @@ Apple.prototype.draw = function () {
   this.position.drawCircle("limeGreen");
 };
 
-Apple.prototype.move = function () {
+Apple.prototype.move = function (occupiedBlocks) {
   let randomCol = Math.floor(Math.random() * (widthInBlock - 2)) + 1,
       randomRow = Math.floor(Math.random() * (heightInBlock - 2)) + 1;
-  
+
   this.position = new Block(randomCol, randomRow);
+
+  for (let i = 0; i < occupiedBlocks.length; i++) {
+    if (this.position.equal(occupiedBlocks[i])) {
+      this.move(occupiedBlocks);
+
+      return;
+    }
+  }
 };
 
 let snake = new Snake(),
@@ -207,7 +215,6 @@ let gameLoop = function () {
   if (playing) {
     setTimeout(gameLoop, animationTime);
   }
-  console.log(animationTime);
 };
 gameLoop();
 
