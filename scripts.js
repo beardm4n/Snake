@@ -34,7 +34,7 @@ let drawScore = function () {
 
 //game over
 let gameOver = function () {
-  clearInterval(intervalId);
+  playing = false;
   context.font = "60px Courier";
   context.fillStyle = "black";
   context.textAlign = "center";
@@ -133,6 +133,7 @@ Snake.prototype.move = function () {
   if (newHead.equal(apple.position)) {
     score++;
     apple.move();
+    animationTime -= 1;
   } else {
     this.segments.pop();
   }
@@ -191,17 +192,24 @@ Apple.prototype.move = function () {
 let snake = new Snake(),
     apple = new Apple();
 
-let intervalId = setInterval(function () {
+let animationTime = 100,
+    playing = true;
+
+let gameLoop = function () {
   context.clearRect(0, 0, width, height);
-  
+
   drawScore();
   snake.move();
   snake.draw();
   apple.draw();
   drawBorder();
 
-}, 100);
-
+  if (playing) {
+    setTimeout(gameLoop, animationTime);
+  }
+  console.log(animationTime);
+};
+gameLoop();
 
 // keyboard control
 let directions = {
